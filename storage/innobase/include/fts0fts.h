@@ -979,4 +979,7 @@ bool fts_check_aux_table(const char *name,
                          table_id_t *table_id,
                          index_id_t *index_id);
 
+/** Clear and initialize the fts cache under init lock
+@param	cache	fts table cache */
+void fts_cache_reinit(fts_cache_t *cache);
 #endif /*!< fts0fts.h */

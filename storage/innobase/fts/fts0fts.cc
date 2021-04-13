@@ -4194,9 +4194,7 @@ fts_sync_commit(
 
 	/* We need to do this within the deleted lock since fts_delete() can
 	attempt to add a deleted doc id to the cache deleted id array. */
-	fts_cache_clear(cache);
-	DEBUG_SYNC_C("fts_deleted_doc_ids_clear");
-	fts_cache_init(cache);
+	fts_cache_reinit(cache);
 	rw_lock_x_unlock(&cache->lock);
 
 	if (UNIV_LIKELY(error == DB_SUCCESS)) {
@@ -6452,4 +6450,12 @@ fts_check_corrupt(
 
 		dict_table_close(aux_table, FALSE, FALSE);
 	}
+}
+
+void fts_cache_reinit(fts_cache_t* cache)
+{
+  rw_lock_x_lock(&cache->init_lock);
+  fts_cache_clear(cache);
+  fts_cache_init(cache);
+  rw_lock_x_unlock(&cache->init_lock);
 }

@@ -1531,8 +1531,7 @@ row_truncate_update_system_tables(
 
 			table->fts->dict_locked = true;
 			fts_update_next_doc_id(trx, table, 0);
-			fts_cache_clear(table->fts->cache);
-			fts_cache_init(table->fts->cache);
+			fts_cache_reinit(table->fts->cache);
 			table->fts->dict_locked = false;
 		}
 	}
