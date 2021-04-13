@@ -429,11 +429,16 @@ int ha_json_table::fill_column_values(uchar * buf, uchar *pos)
   {
     bool is_null_value;
     uint int_pos= 0; /* just to make compilers happy. */
+    uchar *orig_null_ptr, *orig_ptr= NULL;
 
     if (!bitmap_is_set(table->read_set, (*f)->field_index))
-      goto cont_loop;
-
-    if (ptrdiff)
+    {
+      uchar *recbuf= table->record[1];
+      orig_ptr= (*f)->ptr;
+      orig_null_ptr= (*f)->null_ptr;
+      (*f)->move_field(recbuf+1, recbuf, (*f)->null_bit);
+    }
+    else if (ptrdiff)
       (*f)->move_field_offset(ptrdiff);
 
     /*
@@ -540,9 +545,10 @@ int ha_json_table::fill_column_values(uchar * buf, uchar *pos)
       }
       };
     }
-    if (ptrdiff)
+    if (orig_ptr)
+      (*f)->move_field(orig_ptr, orig_null_ptr, (*f)->null_bit);
+    else if (ptrdiff)
       (*f)->move_field_offset(-ptrdiff);
-cont_loop:
     f++;
     if (pos)
       pos+= 4;
